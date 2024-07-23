@@ -16,6 +16,7 @@ public class CompilerController {
 	@PostMapping("/run")
 	public String runCode(@RequestBody CodeRequest codeRequest) {
 		String code = codeRequest.getCode();
+		StringBuilder output = new StringBuilder();
 		try {
 			// Javaファイルの作成
 			FileWriter fileWriter = new FileWriter("Main.java");
@@ -24,21 +25,37 @@ public class CompilerController {
 
 			// コンパイル
 			Process compileProcess = Runtime.getRuntime().exec("javac Main.java");
+			BufferedReader compileErrorReader = new BufferedReader(
+					new InputStreamReader(compileProcess.getErrorStream()));
+			String compileError;
+			while ((compileError = compileErrorReader.readLine()) != null) {
+				output.append(compileError).append("\n");
+			}
 			compileProcess.waitFor();
+
+			// コンパイルエラーがあれば実行しない
+			if (compileProcess.exitValue() != 0) {
+				return output.toString();
+			}
 
 			// 実行
 			Process runProcess = Runtime.getRuntime().exec("java Main");
-			BufferedReader reader = new BufferedReader(new InputStreamReader(runProcess.getInputStream()));
-			StringBuilder output = new StringBuilder();
-			String line;
-			while ((line = reader.readLine()) != null) {
-				output.append(line).append("\n");
+			BufferedReader runOutputReader = new BufferedReader(new InputStreamReader(runProcess.getInputStream()));
+			BufferedReader runErrorReader = new BufferedReader(new InputStreamReader(runProcess.getErrorStream()));
+			String runOutput;
+			while ((runOutput = runOutputReader.readLine()) != null) {
+				output.append(runOutput).append("\n");
 			}
-			return output.toString();
+			String runError;
+			while ((runError = runErrorReader.readLine()) != null) {
+				output.append(runError).append("\n");
+			}
+			runProcess.waitFor();
 		} catch (IOException | InterruptedException e) {
 			e.printStackTrace();
 			return e.getMessage();
 		}
+		return output.toString();
 	}
 
 	@ExceptionHandler(Exception.class)
