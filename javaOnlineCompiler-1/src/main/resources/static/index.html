@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Java Online Compiler</title>
+    <style>
+        body { font-family: Arial, sans-serif; }
+        textarea { width: 100%; height: 200px; }
+        button { margin-top: 10px; }
+        pre { background-color: #f4f4f4; padding: 10px; }
+        .output { margin-top: 20px; }
+    </style>
+</head>
+<body>
+    <h1>Java Online Compiler</h1>
+    <textarea id="code" placeholder="Enter your Java code here..."></textarea>
+    <button onclick="runCode()">Run</button>
+    <div class="output">
+        <h2>Output:</h2>
+        <pre id="output"></pre>
+    </div>
+    <div class="output">
+        <h2>Error:</h2>
+        <pre id="error"></pre>
+    </div>
+
+    <script>
+        async function runCode() {
+            const code = document.getElementById('code').value;
+            try {
+                const response = await fetch('/run', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ code })
+                });
+                const result = await response.json();
+                document.getElementById('output').textContent = result;
+                document.getElementById('error').textContent = '';
+            } catch (error) {
+                document.getElementById('output').textContent = '';
+                document.getElementById('error').textContent = error.message;
+            }
+        }
+    </script>
+</body>
+</html>
