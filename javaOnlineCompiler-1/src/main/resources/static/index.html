@@ -26,7 +26,7 @@
     </div>
 
     <script>
-        async function runCode() {
+		      async function runCode() {
             const code = document.getElementById('code').value;
             try {
                 const response = await fetch('/run', {
@@ -42,6 +42,10 @@
                 document.getElementById('error').textContent = error.message;
             }
         }
+
     </script>
 </body>
 </html>
+
+
+
