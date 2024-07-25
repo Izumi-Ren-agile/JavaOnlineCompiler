@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Chat Room</title>
+    <script type="text/javascript">
+        var socket = new WebSocket("ws://localhost:8080/chat");
+        socket.onmessage = function(event) {
+            var messages = document.getElementById('messages');
+            var message = document.createElement('li');
+            message.appendChild(document.createTextNode(event.data));
+            messages.appendChild(message);
+        };
+        
+        function sendMessage() {
+            var input = document.getElementById("message");
+            socket.send(input.value);
+            input.value = "";
+        }
+    </script>
+</head>
+<body>
+    <h1>Chat Room</h1>
+    <ul id="messages"></ul>
+    <input type="text" id="message" placeholder="Type a message..." />
+    <button onclick="sendMessage()">Send</button>
+</body>
+</html>
